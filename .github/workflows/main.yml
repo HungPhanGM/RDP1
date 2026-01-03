@@ -1,4 +1,4 @@
-name: RDP greenboyMC - TIKTOK LIVE NO LAG + STABLE FIX ERROR 0x4 (2026)
+name: RDP greenboyMC - ULTIMATE GAMING NVIDIA TESLA T4 FAKE (144FPS + 0ms Lag)
 
 on:
   workflow_dispatch:
@@ -22,7 +22,7 @@ jobs:
           if (-not $Env:NGROK_AUTH_TOKEN) { Write-Error "NGROK_AUTH_TOKEN secret chưa được set!" }
           .\ngrok.exe authtoken $Env:NGROK_AUTH_TOKEN
 
-      - name: ULTIMATE STABLE TIKTOK LIVE + FIX ERROR 0x4 + OBS AUTO
+      - name: ULTIMATE GAMING + NVIDIA TESLA T4 FAKE + FIX ERROR 0x4
         run: |
           # Enable RDP
           Set-ItemProperty -Path 'HKLM:\System\CurrentControlSet\Control\Terminal Server' -Name "fDenyTSConnections" -Value 0
@@ -30,79 +30,80 @@ jobs:
 
           # User
           $Password = ConvertTo-SecureString "W1nd0ws-P4ssw0rd-2025!" -AsPlainText -Force
-          New-LocalUser "greenboyMC" -Password $Password -FullName "TIKTOK PRO" -ErrorAction SilentlyContinue
+          New-LocalUser "greenboyMC" -Password $Password -FullName "TESLA GAMER" -ErrorAction SilentlyContinue
           Add-LocalGroupMember -Group "Administrators" -Member "greenboyMC"
           Add-LocalGroupMember -Group "Remote Desktop Users" -Member "greenboyMC"
 
-          # FIX ERROR 0x4: Tắt sleep, screen lock, timeout
-          powercfg -setactive 8c5e7fda-e8bf-4a96-9a85-a6e23a8c635c  # High Performance
+          # FIX ERROR 0x4: Tắt sleep, lock, idle timeout
+          powercfg -setactive 8c5e7fda-e8bf-4a96-9a85-a6e23a8c635c
           powercfg -change -monitor-timeout-ac 0
           powercfg -change -standby-timeout-ac 0
           powercfg -change -hibernate-timeout-ac 0
           reg add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System" /v "InactivityTimeoutSecs" /t REG_DWORD /d 0 /f
           reg add "HKCU\Control Panel\Desktop" /v "ScreenSaveActive" /t REG_SZ /d "0" /f
 
-          # Ultra low latency visuals
+          # Low latency visuals + mouse
           reg add "HKCU\Control Panel\Desktop" /v UserPreferencesMask /t REG_BINARY /d 9012078010000000 /f
-          reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\VisualEffects" /v VisualFXSetting /t REG_DWORD /d 3 /f
+          reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\VisualEffects" /v VisualFXSetting /t REG_DWORD /d 2 /f
           reg add "HKCU\Control Panel\Desktop\WindowMetrics" /v MinAnimate /t REG_SZ /d 0 /f
+          reg add "HKCU\Control Panel\Mouse" /v MouseHoverTime /t REG_SZ /d 0 /f
+          reg add "HKLM\SYSTEM\CurrentControlSet\Services\mouclass\Parameters" /v MouseDataQueueSize /t REG_DWORD /d 100 /f
 
           # Kill heavy services
-          $services = @("SysMain","WSearch","DiagTrack","wuauserv","bits","WindowsSearch","MapsBroker","lfsvc","DoSvc","WaaSMedicSvc")
+          $services = @("SysMain","WSearch","DiagTrack","wuauserv","bits","WindowsSearch","MapsBroker","lfsvc","DoSvc","WaaSMedicSvc","XboxGipSvc","XblAuthManager","XblGameSave")
           foreach ($svc in $services) {
             Stop-Service -Name $svc -Force -ErrorAction SilentlyContinue
             Set-Service -Name $svc -StartupType Disabled -ErrorAction SilentlyContinue
           }
 
-          # TESLA FAKE + Low Latency Tweaks
+          # Power + Game Mode
+          reg add "HKCU\Software\Microsoft\GameBar" /v AllowAutoGameMode /t REG_DWORD /d 1 /f
+          bcdedit /set useplatformtick yes
+          bcdedit /set disabledynamictick yes
+
+          # GPU Fake
+          reg add "HKLM\SYSTEM\CurrentControlSet\Control\GraphicsDrivers" /v HwSchMode /t REG_DWORD /d 2 /f
+
+          # TESLA FAKE TWEAKS
           $tsPath = 'HKLM:\SOFTWARE\Policies\Microsoft\Windows NT\Terminal Services'
           New-Item -Path $tsPath -Force | Out-Null
           Set-ItemProperty -Path $tsPath -Name "AVCHardwareEncodePreferred" -Value 1 -Type DWord
           Set-ItemProperty -Path $tsPath -Name "AVC444ModePreferred" -Value 1 -Type DWord
           Set-ItemProperty -Path $tsPath -Name "fEnableRemoteFX" -Value 1 -Type DWord
+          Set-ItemProperty -Path $tsPath -Name "EnableRemoteFXvGpu" -Value 1 -Type DWord
           Set-ItemProperty -Path $tsPath -Name "MaxCompressionLevel" -Value 0 -Type DWord
 
           reg add "HKLM\SYSTEM\CurrentControlSet\Services\TermDD" /v "FlowControlDisable" /t REG_DWORD /d 1 /f
-          reg add "HKLM\SYSTEM\CurrentControlSet\Services\TermDD" /v "FlowControlDisplayBandwidth" /t REG_DWORD /d 300 /f
+          reg add "HKLM\SYSTEM\CurrentControlSet\Services\TermDD" /v "FlowControlDisplayBandwidth" /t REG_DWORD /d 200 /f
+          reg add "HKLM\SYSTEM\CurrentControlSet\Services\TermDD" /v "FlowControlChannelBandwidth" /t REG_DWORD /d 200 /f
+          reg add "HKLM\SYSTEM\CurrentControlSet\Services\TermDD" /v "FlowControlChargePostCompression" /t REG_DWORD /d 0 /f
 
-          # UDP + Network Optimize
+          # 144FPS Unlock
+          Set-ItemProperty -Path 'HKLM:\SYSTEM\CurrentControlSet\Control\Terminal Server\WinStations' -Name "DWMFRAMEINTERVAL" -Value 5 -Type DWord
+          Set-ItemProperty -Path 'HKLM:\SYSTEM\CurrentControlSet\Control\Terminal Server\WinStations\RDP-Tcp' -Name "MaxOutstandingFrames" -Value 400 -Type DWord
+
+          # UDP Low Latency
           $clientPath = 'HKLM:\SOFTWARE\Policies\Microsoft\Windows NT\Terminal Services\Client'
           New-Item -Path $clientPath -Force | Out-Null
           Set-ItemProperty -Path $clientPath -Name "fClientDisableUDP" -Value 0 -Type DWord
+
+          # Network Throttling OFF
           reg add "HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Multimedia\SystemProfile" /v NetworkThrottlingIndex /t REG_DWORD /d 4294967295 /f
 
-          # Auto Install OBS Studio 32.0.4 Portable (Latest Official)
-          Invoke-WebRequest -Uri "https://github.com/obsproject/obs-studio/releases/download/32.0.4/OBS-Studio-32.0.4-Windows-x64.zip" -OutFile obs.zip
-          Expand-Archive obs.zip -DestinationPath "C:\OBS" -Force
+          Write-Host "🚀 BẢN CŨ ỔN ĐỊNH + FIX ERROR 0x4 HOÀN TẤT!"
 
-          # Mouse Jiggler to prevent idle disconnect (Keep Alive)
-          $jiggler = @'
-          while ($true) {
-            $pos = [System.Windows.Forms.Cursor]::Position
-            [System.Windows.Forms.Cursor]::Position = New-Object System.Drawing.Point(($pos.X + 1), $pos.Y)
-            Start-Sleep -Milliseconds 500
-            [System.Windows.Forms.Cursor]::Position = $pos
-            Start-Sleep -Seconds 30
-          }
-'@
-          $jiggler | Out-File -FilePath "C:\jiggler.ps1" -Encoding ASCII
-          Start-Process powershell -ArgumentList "-ExecutionPolicy Bypass -File C:\jiggler.ps1" -WindowStyle Hidden
-
-          Write-Host "🚀 FIX ERROR 0x4 HOÀN TẤT - SESSION ỔN ĐỊNH 6 GIỜ!"
-          Write-Host "🎥 OBS tại C:\OBS\bin\64bit\obs64.exe - LIVE TIKTOK MƯỢT KHÔNG GIẬT!"
-
-      - name: Start Ngrok Asia & IP STABLE
+      - name: Start Ngrok Asia & Hiện IP
         run: |
           Write-Host "=================================================="
-          Write-Host "🚀 TIKTOK LIVE RDP - STABLE NO ERROR 0x4 2026 🚀"
+          Write-Host "🚀 ULTIMATE GAMING RDP - TESLA FAKE 2026 🚀"
           Write-Host "Username: greenboyMC"
           Write-Host "Password: W1nd0ws-P4ssw0rd-2025!"
-          Write-Host "🎥 OBS Ready | Mouse Jiggler ON | No Sleep/Lock"
+          Write-Host "No Sleep | No Lock | Stable Session"
           Write-Host "=================================================="
 
           Start-Process -FilePath ".\ngrok.exe" -ArgumentList "tcp 3389 --region ap --log=stdout" -RedirectStandardOutput "ngrok.log" -NoNewWindow
 
-          $maxAttempts = 25
+          $maxAttempts = 20
           $attempt = 0
           $tunnelUrl = $null
 
@@ -114,19 +115,19 @@ jobs:
               $tcpTunnel = $tunnels.tunnels | Where-Object { $_.proto -eq "tcp" }
               if ($tcpTunnel) { $tunnelUrl = $tcpTunnel.public_url }
             } catch {
-              Write-Host "⏳ Đang khởi động stable RDP... ($attempt/$maxAttempts)"
+              Write-Host "Đang khởi động... ($attempt/$maxAttempts)"
             }
           }
 
           if ($tunnelUrl) {
             $hostPort = $tunnelUrl -replace "tcp://", ""
-            Write-Host "🎥 CONNECT NGAY - KHÔNG CÒN LỖI 0x4 NỮA! 🎥"
+            Write-Host "🚀 CONNECT NGAY - KHÔNG LỖI 0x4! 🚀"
             Write-Host "Address: $hostPort"
             Write-Host "Host: $($hostPort.Split(':')[0])"
             Write-Host "Port: $($hostPort.Split(':')[1])"
             Write-Host "=================================================="
           } else {
-            Write-Host "❌ IP Error - Run lại thử!"
+            Write-Host "Lỗi IP - Run lại!"
           }
 
           Start-Sleep -Seconds 21600
