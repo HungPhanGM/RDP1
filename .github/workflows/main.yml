@@ -1,4 +1,4 @@
-name: RDP greenboyMC - SUPER STABLE NO ERROR 0x4 (2026)
+name: RDP greenboyMC - STABLE NO ERROR 0x4 (2026)
 
 on:
   workflow_dispatch:
@@ -19,80 +19,46 @@ jobs:
         env:
           NGROK_AUTH_TOKEN: ${{ secrets.NGROK_AUTH_TOKEN }}
         run: |
-          if (-not $Env:NGROK_AUTH_TOKEN) { Write-Error "NGROK_AUTH_TOKEN chưa set!" }
           .\ngrok.exe authtoken $Env:NGROK_AUTH_TOKEN
 
-      - name: SUPER STABLE RDP SETUP + FIX ERROR 0x4
+      - name: STABLE RDP SETUP
         run: |
-          # Enable RDP
           Set-ItemProperty -Path 'HKLM:\System\CurrentControlSet\Control\Terminal Server' -Name "fDenyTSConnections" -Value 0
           Enable-NetFirewallRule -DisplayGroup "Remote Desktop"
 
-          # User
           $Password = ConvertTo-SecureString "W1nd0ws-P4ssw0rd-2025!" -AsPlainText -Force
-          New-LocalUser "greenboyMC" -Password $Password -FullName "Stable User" -ErrorAction SilentlyContinue
+          New-LocalUser "greenboyMC" -Password $Password -FullName "Stable" -ErrorAction SilentlyContinue
           Add-LocalGroupMember -Group "Administrators" -Member "greenboyMC"
           Add-LocalGroupMember -Group "Remote Desktop Users" -Member "greenboyMC"
 
-          # FIX ERROR 0x4: Tắt hết sleep, lock, timeout
           powercfg -setactive 8c5e7fda-e8bf-4a96-9a85-a6e23a8c635c
           powercfg -change -monitor-timeout-ac 0
           powercfg -change -standby-timeout-ac 0
           powercfg -change -hibernate-timeout-ac 0
-          powercfg -change -disk-timeout-ac 0
-          reg add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System" /v "InactivityTimeoutSecs" /t REG_DWORD /d 0 /f
+
           reg add "HKCU\Control Panel\Desktop" /v "ScreenSaveActive" /t REG_SZ /d "0" /f
-          reg add "HKCU\Control Panel\Desktop" /v "ScreenSaverIsSecure" /t REG_SZ /d "0" /f
 
-          # Low latency basic
-          reg add "HKCU\Control Panel\Desktop" /v UserPreferencesMask /t REG_BINARY /d 9012038010000000 /f
-          reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\VisualEffects" /v VisualFXSetting /t REG_DWORD /d 3 /f
-          reg add "HKCU\Control Panel\Desktop\WindowMetrics" /v MinAnimate /t REG_SZ /d 0 /f
+          Write-Host "RDP STABLE READY!"
 
-          # UDP for lower latency
-          $clientPath = 'HKLM:\SOFTWARE\Policies\Microsoft\Windows NT\Terminal Services\Client'
-          New-Item -Path $clientPath -Force | Out-Null
-          Set-ItemProperty -Path $clientPath -Name "fClientDisableUDP" -Value 0 -Type DWord
-
-          # Network throttling off
-          reg add "HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Multimedia\SystemProfile" /v NetworkThrottlingIndex /t REG_DWORD /d 4294967295 /f
-
-          Write-Host "🚀 SUPER STABLE RDP READY - ÍT LỖI 0x4 NHẤT!"
-
-      - name: Start Ngrok Asia & Hiện IP
+      - name: Start Ngrok & IP
         run: |
-          Write-Host "=================================================="
-          Write-Host "🚀 SUPER STABLE RDP 2026 🚀"
           Write-Host "Username: greenboyMC"
           Write-Host "Password: W1nd0ws-P4ssw0rd-2025!"
-          Write-Host "No Sleep | No Lock | Connect Ngay!"
-          Write-Host "=================================================="
-
           Start-Process -FilePath ".\ngrok.exe" -ArgumentList "tcp 3389 --region ap" -NoNewWindow
 
-          $maxAttempts = 20
           $attempt = 0
-          $tunnelUrl = $null
-
-          while ($attempt -lt $maxAttempts -and -not $tunnelUrl) {
+          while ($attempt -lt 20) {
             Start-Sleep -Seconds 5
-            $attempt++
             try {
               $tunnels = Invoke-RestMethod http://localhost:4040/api/tunnels
-              $tcpTunnel = $tunnels.tunnels | Where-Object { $_.proto -eq "tcp" }
-              if ($tcpTunnel) { $tunnelUrl = $tcpTunnel.public_url }
+              $tcp = $tunnels.tunnels | Where-Object { $_.proto -eq "tcp" }
+              if ($tcp) {
+                $hostPort = $tcp.public_url -replace "tcp://",""
+                Write-Host "CONNECT NGAY: $hostPort"
+                break
+              }
             } catch {}
-          }
-
-          if ($tunnelUrl) {
-            $hostPort = $tunnelUrl -replace "tcp://", ""
-            Write-Host "🚀 CONNECT NGAY ĐI BRO - SIÊU ỔN ĐỊNH! 🚀"
-            Write-Host "Address: $hostPort"
-            Write-Host "Host: $($hostPort.Split(':')[0])"
-            Write-Host "Port: $($hostPort.Split(':')[1])"
-            Write-Host "=================================================="
-          } else {
-            Write-Host "Lỗi IP - Run lại nhé!"
+            $attempt++
           }
 
           Start-Sleep -Seconds 21600
