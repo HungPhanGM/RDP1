@@ -1,4 +1,4 @@
-name: RDP greenboyMC - ULTIMATE GAMING NVIDIA TESLA T4 FAKE (144FPS + 0ms Lag)
+name: RDP greenboyMC - SUPER STABLE NO ERROR 0x4 (2026)
 
 on:
   workflow_dispatch:
@@ -19,10 +19,10 @@ jobs:
         env:
           NGROK_AUTH_TOKEN: ${{ secrets.NGROK_AUTH_TOKEN }}
         run: |
-          if (-not $Env:NGROK_AUTH_TOKEN) { Write-Error "NGROK_AUTH_TOKEN secret chưa được set!" }
+          if (-not $Env:NGROK_AUTH_TOKEN) { Write-Error "NGROK_AUTH_TOKEN chưa set!" }
           .\ngrok.exe authtoken $Env:NGROK_AUTH_TOKEN
 
-      - name: ULTIMATE GAMING + NVIDIA TESLA T4 FAKE + FIX ERROR 0x4
+      - name: SUPER STABLE RDP SETUP + FIX ERROR 0x4
         run: |
           # Enable RDP
           Set-ItemProperty -Path 'HKLM:\System\CurrentControlSet\Control\Terminal Server' -Name "fDenyTSConnections" -Value 0
@@ -30,104 +30,69 @@ jobs:
 
           # User
           $Password = ConvertTo-SecureString "W1nd0ws-P4ssw0rd-2025!" -AsPlainText -Force
-          New-LocalUser "greenboyMC" -Password $Password -FullName "TESLA GAMER" -ErrorAction SilentlyContinue
+          New-LocalUser "greenboyMC" -Password $Password -FullName "Stable User" -ErrorAction SilentlyContinue
           Add-LocalGroupMember -Group "Administrators" -Member "greenboyMC"
           Add-LocalGroupMember -Group "Remote Desktop Users" -Member "greenboyMC"
 
-          # FIX ERROR 0x4: Tắt sleep, lock, idle timeout
+          # FIX ERROR 0x4: Tắt hết sleep, lock, timeout
           powercfg -setactive 8c5e7fda-e8bf-4a96-9a85-a6e23a8c635c
           powercfg -change -monitor-timeout-ac 0
           powercfg -change -standby-timeout-ac 0
           powercfg -change -hibernate-timeout-ac 0
+          powercfg -change -disk-timeout-ac 0
           reg add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System" /v "InactivityTimeoutSecs" /t REG_DWORD /d 0 /f
           reg add "HKCU\Control Panel\Desktop" /v "ScreenSaveActive" /t REG_SZ /d "0" /f
+          reg add "HKCU\Control Panel\Desktop" /v "ScreenSaverIsSecure" /t REG_SZ /d "0" /f
 
-          # Low latency visuals + mouse
-          reg add "HKCU\Control Panel\Desktop" /v UserPreferencesMask /t REG_BINARY /d 9012078010000000 /f
-          reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\VisualEffects" /v VisualFXSetting /t REG_DWORD /d 2 /f
+          # Low latency basic
+          reg add "HKCU\Control Panel\Desktop" /v UserPreferencesMask /t REG_BINARY /d 9012038010000000 /f
+          reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\VisualEffects" /v VisualFXSetting /t REG_DWORD /d 3 /f
           reg add "HKCU\Control Panel\Desktop\WindowMetrics" /v MinAnimate /t REG_SZ /d 0 /f
-          reg add "HKCU\Control Panel\Mouse" /v MouseHoverTime /t REG_SZ /d 0 /f
-          reg add "HKLM\SYSTEM\CurrentControlSet\Services\mouclass\Parameters" /v MouseDataQueueSize /t REG_DWORD /d 100 /f
 
-          # Kill heavy services
-          $services = @("SysMain","WSearch","DiagTrack","wuauserv","bits","WindowsSearch","MapsBroker","lfsvc","DoSvc","WaaSMedicSvc","XboxGipSvc","XblAuthManager","XblGameSave")
-          foreach ($svc in $services) {
-            Stop-Service -Name $svc -Force -ErrorAction SilentlyContinue
-            Set-Service -Name $svc -StartupType Disabled -ErrorAction SilentlyContinue
-          }
-
-          # Power + Game Mode
-          reg add "HKCU\Software\Microsoft\GameBar" /v AllowAutoGameMode /t REG_DWORD /d 1 /f
-          bcdedit /set useplatformtick yes
-          bcdedit /set disabledynamictick yes
-
-          # GPU Fake
-          reg add "HKLM\SYSTEM\CurrentControlSet\Control\GraphicsDrivers" /v HwSchMode /t REG_DWORD /d 2 /f
-
-          # TESLA FAKE TWEAKS
-          $tsPath = 'HKLM:\SOFTWARE\Policies\Microsoft\Windows NT\Terminal Services'
-          New-Item -Path $tsPath -Force | Out-Null
-          Set-ItemProperty -Path $tsPath -Name "AVCHardwareEncodePreferred" -Value 1 -Type DWord
-          Set-ItemProperty -Path $tsPath -Name "AVC444ModePreferred" -Value 1 -Type DWord
-          Set-ItemProperty -Path $tsPath -Name "fEnableRemoteFX" -Value 1 -Type DWord
-          Set-ItemProperty -Path $tsPath -Name "EnableRemoteFXvGpu" -Value 1 -Type DWord
-          Set-ItemProperty -Path $tsPath -Name "MaxCompressionLevel" -Value 0 -Type DWord
-
-          reg add "HKLM\SYSTEM\CurrentControlSet\Services\TermDD" /v "FlowControlDisable" /t REG_DWORD /d 1 /f
-          reg add "HKLM\SYSTEM\CurrentControlSet\Services\TermDD" /v "FlowControlDisplayBandwidth" /t REG_DWORD /d 200 /f
-          reg add "HKLM\SYSTEM\CurrentControlSet\Services\TermDD" /v "FlowControlChannelBandwidth" /t REG_DWORD /d 200 /f
-          reg add "HKLM\SYSTEM\CurrentControlSet\Services\TermDD" /v "FlowControlChargePostCompression" /t REG_DWORD /d 0 /f
-
-          # 144FPS Unlock
-          Set-ItemProperty -Path 'HKLM:\SYSTEM\CurrentControlSet\Control\Terminal Server\WinStations' -Name "DWMFRAMEINTERVAL" -Value 5 -Type DWord
-          Set-ItemProperty -Path 'HKLM:\SYSTEM\CurrentControlSet\Control\Terminal Server\WinStations\RDP-Tcp' -Name "MaxOutstandingFrames" -Value 400 -Type DWord
-
-          # UDP Low Latency
+          # UDP for lower latency
           $clientPath = 'HKLM:\SOFTWARE\Policies\Microsoft\Windows NT\Terminal Services\Client'
           New-Item -Path $clientPath -Force | Out-Null
           Set-ItemProperty -Path $clientPath -Name "fClientDisableUDP" -Value 0 -Type DWord
 
-          # Network Throttling OFF
+          # Network throttling off
           reg add "HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Multimedia\SystemProfile" /v NetworkThrottlingIndex /t REG_DWORD /d 4294967295 /f
 
-          Write-Host "🚀 BẢN CŨ ỔN ĐỊNH + FIX ERROR 0x4 HOÀN TẤT!"
+          Write-Host "🚀 SUPER STABLE RDP READY - ÍT LỖI 0x4 NHẤT!"
 
       - name: Start Ngrok Asia & Hiện IP
         run: |
           Write-Host "=================================================="
-          Write-Host "🚀 ULTIMATE GAMING RDP - TESLA FAKE 2026 🚀"
+          Write-Host "🚀 SUPER STABLE RDP 2026 🚀"
           Write-Host "Username: greenboyMC"
           Write-Host "Password: W1nd0ws-P4ssw0rd-2025!"
-          Write-Host "No Sleep | No Lock | Stable Session"
+          Write-Host "No Sleep | No Lock | Connect Ngay!"
           Write-Host "=================================================="
 
-          Start-Process -FilePath ".\ngrok.exe" -ArgumentList "tcp 3389 --region ap --log=stdout" -RedirectStandardOutput "ngrok.log" -NoNewWindow
+          Start-Process -FilePath ".\ngrok.exe" -ArgumentList "tcp 3389 --region ap" -NoNewWindow
 
           $maxAttempts = 20
           $attempt = 0
           $tunnelUrl = $null
 
           while ($attempt -lt $maxAttempts -and -not $tunnelUrl) {
-            Start-Sleep -Seconds 4
+            Start-Sleep -Seconds 5
             $attempt++
             try {
-              $tunnels = Invoke-RestMethod -Uri "http://localhost:4040/api/tunnels" -TimeoutSec 8
+              $tunnels = Invoke-RestMethod http://localhost:4040/api/tunnels
               $tcpTunnel = $tunnels.tunnels | Where-Object { $_.proto -eq "tcp" }
               if ($tcpTunnel) { $tunnelUrl = $tcpTunnel.public_url }
-            } catch {
-              Write-Host "Đang khởi động... ($attempt/$maxAttempts)"
-            }
+            } catch {}
           }
 
           if ($tunnelUrl) {
             $hostPort = $tunnelUrl -replace "tcp://", ""
-            Write-Host "🚀 CONNECT NGAY - KHÔNG LỖI 0x4! 🚀"
+            Write-Host "🚀 CONNECT NGAY ĐI BRO - SIÊU ỔN ĐỊNH! 🚀"
             Write-Host "Address: $hostPort"
             Write-Host "Host: $($hostPort.Split(':')[0])"
             Write-Host "Port: $($hostPort.Split(':')[1])"
             Write-Host "=================================================="
           } else {
-            Write-Host "Lỗi IP - Run lại!"
+            Write-Host "Lỗi IP - Run lại nhé!"
           }
 
           Start-Sleep -Seconds 21600
