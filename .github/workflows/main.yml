@@ -1,4 +1,4 @@
-name: RDP greenboyMC - STABLE NO ERROR 0x4 (2026)
+name: RDP greenboyMC - SUPER CLEAN BASIC RDP (Stable Connect 2026)
 
 on:
   workflow_dispatch:
@@ -21,29 +21,35 @@ jobs:
         run: |
           .\ngrok.exe authtoken $Env:NGROK_AUTH_TOKEN
 
-      - name: STABLE RDP SETUP
+      - name: BASIC CLEAN RDP SETUP
         run: |
+          # Enable RDP
           Set-ItemProperty -Path 'HKLM:\System\CurrentControlSet\Control\Terminal Server' -Name "fDenyTSConnections" -Value 0
           Enable-NetFirewallRule -DisplayGroup "Remote Desktop"
 
+          # Create user
           $Password = ConvertTo-SecureString "W1nd0ws-P4ssw0rd-2025!" -AsPlainText -Force
-          New-LocalUser "greenboyMC" -Password $Password -FullName "Stable" -ErrorAction SilentlyContinue
+          New-LocalUser "greenboyMC" -Password $Password -FullName "Clean User" -ErrorAction SilentlyContinue
           Add-LocalGroupMember -Group "Administrators" -Member "greenboyMC"
           Add-LocalGroupMember -Group "Remote Desktop Users" -Member "greenboyMC"
 
+          # Chỉ tắt sleep và lock để tránh disconnect khi idle
           powercfg -setactive 8c5e7fda-e8bf-4a96-9a85-a6e23a8c635c
           powercfg -change -monitor-timeout-ac 0
           powercfg -change -standby-timeout-ac 0
           powercfg -change -hibernate-timeout-ac 0
-
           reg add "HKCU\Control Panel\Desktop" /v "ScreenSaveActive" /t REG_SZ /d "0" /f
 
-          Write-Host "RDP STABLE READY!"
+          Write-Host "🚀 RDP SIÊU SẠCH SẴN SÀNG - KHÔNG TẢI NẶNG!"
 
-      - name: Start Ngrok & IP
+      - name: Start Ngrok AP & Hiện IP
         run: |
+          Write-Host "=================================================="
+          Write-Host "🚀 RDP BASIC CLEAN - REGION AP (MƯỢT NHẤT VN) 🚀"
           Write-Host "Username: greenboyMC"
           Write-Host "Password: W1nd0ws-P4ssw0rd-2025!"
+          Write-Host "=================================================="
+
           Start-Process -FilePath ".\ngrok.exe" -ArgumentList "tcp 3389 --region ap" -NoNewWindow
 
           $attempt = 0
@@ -54,7 +60,11 @@ jobs:
               $tcp = $tunnels.tunnels | Where-Object { $_.proto -eq "tcp" }
               if ($tcp) {
                 $hostPort = $tcp.public_url -replace "tcp://",""
-                Write-Host "CONNECT NGAY: $hostPort"
+                Write-Host "🚀 CONNECT NGAY BRO - BẢN SẠCH NÀY ỔN HƠN NÈ! 🚀"
+                Write-Host "Address: $hostPort"
+                Write-Host "Host: $($hostPort.Split(':')[0])"
+                Write-Host "Port: $($hostPort.Split(':')[1])"
+                Write-Host "=================================================="
                 break
               }
             } catch {}
